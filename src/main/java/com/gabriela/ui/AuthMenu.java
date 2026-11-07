@@ -1,7 +1,7 @@
-
 package com.gabriela.ui;
 
-import com.gabriela.dao.UserDao;
+import com.gabriela.Authentication;
+import com.gabriela.model.User;
 import java.util.Scanner;
 
 public class AuthMenu {
@@ -9,7 +9,7 @@ public class AuthMenu {
     public static void showMenu() {
 
         Scanner scanner = new Scanner(System.in);
-        UserDao userDao = new UserDao();
+        Authentication authentication = new Authentication();
 
         int choice;
 
@@ -43,27 +43,19 @@ public class AuthMenu {
                     int roleChoice = scanner.nextInt();
                     scanner.nextLine();
 
-                    String role = "";
-
-                    switch (roleChoice) {
-                        case 1:
-                            role = "ADMINISTRATOR";
-                            break;
-                        case 2:
-                            role = "FLORIST";
-                            break;
-                        case 3:
-                            role = "ORDER_CLERK";
-                            break;
-                        default:
-                            System.out.println("Invalid role choice.");
-                    }
+                    String role = switch (roleChoice) {
+                        case 1 -> "ADMINISTRATOR";
+                        case 2 -> "FLORIST";
+                        case 3 -> "ORDER_CLERK";
+                        default -> "";
+                    };
 
                     if (!role.isEmpty()) {
-                        userDao.registerUser(username, password, role);
+                        authentication.register(username, password, role);
+                    } else {
+                        System.out.println("Invalid role choice.");
                     }
                     break;
-
 
                 case 2:
                     System.out.println("\n===== LOGIN =====");
@@ -74,27 +66,20 @@ public class AuthMenu {
                     System.out.print("Enter password: ");
                     String loginPassword = scanner.nextLine();
 
-                    var loggedInUser = userDao.loginUser(
+                    User loggedInUser = authentication.login(
                             loginUsername, loginPassword
                     );
-
 
                     if (loggedInUser != null) {
                         System.out.println("\nLogin successful!");
                         System.out.println("Welcome, " + loggedInUser.username());
 
-                        boolean exit = showUserMenu(loggedInUser, scanner);
-
-                        if (exit) {
-                            return;
-                        }
+                        RoleMenu.showMenu(loggedInUser, scanner);
 
                     } else {
                         System.out.println("\nInvalid username or password.");
                     }
                     break;
-
-
 
                 case 3:
                     System.out.println("Thank you for using the system!");
@@ -105,46 +90,5 @@ public class AuthMenu {
             }
 
         } while (choice != 3);
-    }
-
-    private static boolean showUserMenu(
-            com.gabriela.model.User user,
-            Scanner scanner) {
-
-        int choice;
-
-        do {
-            System.out.println("\n===== USER MENU =====");
-            System.out.println("1. View Account Information");
-            System.out.println("2. Logout");
-            System.out.println("3. Exit");
-            System.out.print("Enter your choice: ");
-
-            choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-
-                case 1:
-                    System.out.println("\n===== ACCOUNT INFORMATION =====");
-                    System.out.println("Username: " + user.username());
-                    System.out.println("Role: " + user.role());
-                    System.out.println("Status: " + user.status());
-                    break;
-
-                case 2:
-                    System.out.println("\nLogout successful!");
-                    System.out.println("Returning to main menu...");
-                    return false;
-
-                case 3:
-                    System.out.println("\nThank you for using the system!");
-                    return true;
-
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-            }
-
-        } while (true);
     }
 }

@@ -1,7 +1,5 @@
-
 package com.gabriela;
 
-import com.gabriela.dao.UserDao;
 import com.gabriela.ui.AuthMenu;
 
 public class Main {
@@ -10,9 +8,7 @@ public class Main {
 
         System.out.println("Welcome to the Custom Flower Bouquet System!");
 
-        UserDao userDao = new UserDao();
-
-        userDao.createUsersTable();
+        DatabaseInitializer.initializeDatabase();
 
         AuthMenu.showMenu();
     }
