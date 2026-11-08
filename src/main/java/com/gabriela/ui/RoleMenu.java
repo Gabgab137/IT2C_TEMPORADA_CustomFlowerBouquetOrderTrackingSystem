@@ -1,3 +1,4 @@
+
 package com.gabriela.ui;
 
 import com.gabriela.model.User;
@@ -62,7 +63,7 @@ public class RoleMenu {
 
             if (user.role().equals("ADMINISTRATOR") && choice == 1) {
 
-                AdminMenu adminMenu = new AdminMenu();
+                AdminMenu adminMenu = new AdminMenu(user);
                 adminMenu.showMenu(scanner);
 
             } else {
@@ -70,6 +71,7 @@ public class RoleMenu {
                 System.out.println("This feature will be implemented in a later development step.");
 
             }
+
         } while (true);
     }
 }

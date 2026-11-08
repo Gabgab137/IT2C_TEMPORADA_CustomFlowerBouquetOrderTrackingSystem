@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class UserDao {
 
@@ -190,6 +191,32 @@ public class UserDao {
 
         } catch (SQLException e) {
             System.out.println("Error approving user: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // UPDATE USER ROLE AND STATUS
+    public boolean updateUserRoleAndStatus(int userId, String newRole, String newStatus) {
+
+        String sql = """
+                UPDATE users
+                SET roles = ?, status = ?
+                WHERE id = ?
+                """;
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, newRole.trim().toUpperCase(Locale.ROOT));
+            statement.setString(2, newStatus.trim().toUpperCase(Locale.ROOT));
+            statement.setInt(3, userId);
+
+            int rowsUpdated = statement.executeUpdate();
+
+            return rowsUpdated > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error updating user: " + e.getMessage());
             return false;
         }
     }
