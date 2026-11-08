@@ -1,10 +1,14 @@
+
 package com.gabriela.dao;
 
 import com.gabriela.model.User;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDao {
 
@@ -104,5 +108,89 @@ public class UserDao {
         return null;
     }
 
+    // GET ALL REGISTERED USERS
+    public List<User> getAllUsers() {
 
+        String sql = "SELECT * FROM users";
+
+        List<User> users = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            var result = statement.executeQuery();
+
+            while (result.next()) {
+
+                users.add(new User(
+                        result.getInt("id"),
+                        result.getString("username"),
+                        result.getString("password"),
+                        result.getString("roles"),
+                        result.getString("status")
+                ));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error retrieving users: " + e.getMessage());
+        }
+
+        return users;
+    }
+
+    // GET ALL PENDING USERS
+    public List<User> getPendingUsers() {
+
+        String sql = "SELECT * FROM users WHERE status = ?";
+
+        List<User> users = new ArrayList<>();
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, "PENDING");
+
+            var result = statement.executeQuery();
+
+            while (result.next()) {
+
+                users.add(new User(
+                        result.getInt("id"),
+                        result.getString("username"),
+                        result.getString("password"),
+                        result.getString("roles"),
+                        result.getString("status")
+                ));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error retrieving pending users: " + e.getMessage());
+        }
+
+        return users;
+    }
+
+    // APPROVE USER ACCOUNT
+    public boolean approveUser(int userId) {
+
+        String sql = """
+                UPDATE users
+                SET status = 'APPROVED'
+                WHERE id = ?
+                """;
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, userId);
+
+            int rowsUpdated = statement.executeUpdate();
+
+            return rowsUpdated > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error approving user: " + e.getMessage());
+            return false;
+        }
+    }
 }

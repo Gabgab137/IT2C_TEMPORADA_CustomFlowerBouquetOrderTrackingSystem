@@ -60,8 +60,16 @@ public class RoleMenu {
                 return;
             }
 
-            System.out.println("This feature will be implemented in a later development step.");
+            if (user.role().equals("ADMINISTRATOR") && choice == 1) {
 
+                AdminMenu adminMenu = new AdminMenu();
+                adminMenu.showMenu(scanner);
+
+            } else {
+
+                System.out.println("This feature will be implemented in a later development step.");
+
+            }
         } while (true);
     }
 }
